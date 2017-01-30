@@ -1,13 +1,13 @@
 **1. install**
 
-    npm install -g json-server
-
-    npm install faker loadash
+    npm install 
 
 **2. run**
 
-    json-server generate.js 
+   npm server.js
     
 **3. available requests**
 
-    -- coming soon --
+    POST login
+    GET transactions
+    GET summarty

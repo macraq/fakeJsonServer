@@ -1,4 +1,102 @@
 {
-  "people": [],
-  "posts": []
+  "users": [
+    {
+      "id": 0,
+      "accessToken": false,
+      "login": "admin",
+      "password": "test1"
+    },
+    {
+      "id": 1,
+      "accessToken": false,
+      "login": "admin",
+      "password": "test2"
+    }
+  ],
+  "dealers": [
+    {
+      "dealerId": 0,
+      "dealerName": "dealer 1"
+    },
+    {
+      "dealerId": 1,
+      "dealerName": "dealer 2"
+    },
+    {
+      "dealerId": 2,
+      "dealerName": "dealer 3"
+    }
+  ],
+  "funds": [
+    {
+      "id": 0,
+      "name": "akcji polskich"
+    },
+    {
+      "id": 1,
+      "name": "stabilnego wzrostu"
+    },
+    {
+      "id": 2,
+      "name": "zrównoważone"
+    },
+    {
+      "id": 3,
+      "name": "dłużne polskie"
+    }
+  ],
+  "products": [
+    {
+      "id": 0,
+      "name": "Rejestry zwykłe",
+      "funds": [
+        {
+          "fundId": 0,
+          "percent": 60
+        },
+        {
+          "fundId": 2,
+          "percent": 40
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "PSO",
+      "funds": [
+        {
+          "fundId": 0,
+          "percent": 30
+        },
+        {
+          "fundId": 1,
+          "percent": 70
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "IKE",
+      "funds": [
+        {
+          "fundId": 2,
+          "percent": 10
+        },
+        {
+          "fundId": 3,
+          "percent": 90
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "IKZE",
+      "funds": [
+        {
+          "fundId": 3,
+          "percent": 100
+        }
+      ]
+    }
+  ]
 }
