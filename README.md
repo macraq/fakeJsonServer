@@ -10,4 +10,6 @@
 
     POST login
     GET transactions
-    GET summarty
+    GET summary
+    GET productSummary
+    GET fundSummary

@@ -24,10 +24,10 @@ server.use(jsonServer.bodyParser);
 
 server.post('/login', function (req, res) {
     var token = authorize.check(req.body.login, req.body.password, data.users);
-    if(!token){
+    if (!token) {
         return res.sendStatus(403);
     }
-    res.jsonp({token:token});
+    res.jsonp({token: token});
 });
 
 server.use(function (req, res, next) {
@@ -38,16 +38,15 @@ server.use(function (req, res, next) {
     }
 })
 
-
 server.get('/transactions', function (req, res) {
     res.jsonp(transactions.data);
 });
 
-server.post('/transactions', function(req, res){
+server.post('/transactions', function (req, res) {
     var last = _.last(transactions.data);
     var data = req.body;
-    _.pull(data, _.add(last.transactionId, 1));
-    _.pull(transactions.data, data);
+    _.set(data, 'transactionId', _.add(last.transactionId, 1));
+    transactions.data = _.concat(transactions.data, data);
     res.jsonp(data);
 });
 
@@ -55,13 +54,73 @@ server.get('/summary', function (req, res) {
     var summary = {
         purchase: 0,
         buy: 0
-    }
+    };
     _.each(transactions.data, function (transaction) {
-        summary.purchase = _.add(summary.purchase, _.toNumber(transaction.purchase));
-        summary.buy = _.add(summary.buy, _.toNumber(transaction.buy));
+        _.set(summary, 'purchase', _.add(summary.purchase, _.toNumber(transaction.purchase)));
+        _.set(summary, 'buy', _.add(summary.buy, _.toNumber(transaction.buy)));
+    });
+    res.jsonp(summary);
+});
+
+server.get('/productSummary', function (req, res) {
+    var summary = {};
+    _.each(transactions.data, function (transaction) {
+        if (transaction.productId) {
+            if (!_.has(summary, transaction.productId)) {
+                _.set(summary, transaction.productId, {
+                    purchase: 0,
+                    buy: 0
+                });
+            }
+            _.set(summary, transaction.productId + ".purchase",
+                _.add(_.get(summary, transaction.productId + ".purchase"), _.toNumber(transaction.purchase)));
+            _.set(summary, transaction.productId + ".buy",
+                _.add(_.get(summary, transaction.productId + ".buy"), _.toNumber(transaction.buy)));
+        }
+
     })
     res.jsonp(summary);
 });
+
+server.get('/fundSummary', function (req, res) {
+    var summary = {};
+    var addFundBuy = function (fundId, value) {
+        if (!_.has(summary, fundId)) {
+            _.set(summary, fundId, {
+                purchase: 0,
+                buy: 0
+            })
+        }
+        _.set(summary, fundId + ".buy",
+            _.add(_.get(summary, fundId + ".buy"), value));
+    };
+    var addFundPurchase = function (fundId, value) {
+        if (!_.has(summary, fundId)) {
+            _.set(summary, fundId, {
+                purchase: 0,
+                buy: 0
+            })
+        }
+        _.set(summary, fundId + ".purchase",
+            _.add(_.get(summary, fundId + ".purchase"), value));
+    };
+    _.each(transactions.data, function (transaction) {
+        if (_.has(transaction, 'fundId') && _.get(transaction, 'fundId')) {
+            addFundBuy(transaction.fundId, _.toNumber(transaction.buy));
+            addFundPurchase(transaction.fundId, _.toNumber(transaction.purchase));
+
+        } else {
+            var product = _.find(data.products, {"id": transaction.productId});
+            if (product && _.size(product.funds)) {
+                _.each(product.funds, function (fund) {
+                    addFundBuy(fund.fundId, _.toNumber(transaction.buy*(fund.percent/100)));
+                    addFundPurchase(fund.fundId, _.toNumber(transaction.purchase*(fund.percent/100)));
+                });
+            }
+        }
+    });
+    res.jsonp(summary);
+})
 
 server.use(router);
 
